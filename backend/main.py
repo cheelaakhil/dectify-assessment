@@ -1,18 +1,17 @@
 """
 SpaceToday API – DECTIFY Full Stack Assessment
 """
-import os
-import logging
-from contextlib import asynccontextmanager
-
-from pathlib import Path
-from dotenv import load_dotenv
-env_path = Path(__file__).resolve().parent / ".env"
-load_dotenv(dotenv_path=env_path, override=True)
-
 import traceback
 
 try:
+    import os
+    import logging
+    from contextlib import asynccontextmanager
+    from pathlib import Path
+    from dotenv import load_dotenv
+
+    env_path = Path(__file__).resolve().parent / ".env"
+    load_dotenv(dotenv_path=env_path, override=True)
     from fastapi import FastAPI, Request
     from fastapi.middleware.cors import CORSMiddleware
     from fastapi.responses import JSONResponse
