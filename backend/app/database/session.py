@@ -12,7 +12,7 @@ elif DATABASE_URL.startswith("postgresql://"):
     DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 
 if "postgresql" in DATABASE_URL and "?" not in DATABASE_URL:
-    DATABASE_URL += "?ssl=require"
+    DATABASE_URL += "?sslmode=require"
 
 engine = create_async_engine(DATABASE_URL, echo=False)
 AsyncSessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
