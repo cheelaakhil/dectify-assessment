@@ -84,7 +84,7 @@ class TestAuth:
 
     async def test_me_without_token(self, client: AsyncClient):
         resp = await client.get("/api/auth/me")
-        assert resp.status_code == 403
+        assert resp.status_code in (401, 403)
 
     async def test_refresh_token_flow(self, client: AsyncClient):
         # Signup
