@@ -40,9 +40,10 @@ logger = logging.getLogger("spacetoday")
 async def lifespan(application: FastAPI):
     """Create tables on startup, dispose engine on shutdown."""
     logger.info("Starting SpaceToday API …")
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    logger.info("Database tables ready.")
+    if "sqlite" in str(engine.url):
+        async with engine.begin() as conn:
+            await conn.run_sync(Base.metadata.create_all)
+        logger.info("Database tables ready.")
     
     # Initialize Redis if configured
     redis_url = os.getenv("REDIS_URL")
