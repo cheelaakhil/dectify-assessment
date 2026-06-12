@@ -1,0 +1,16 @@
+"""
+Tests for the health endpoint.
+"""
+import pytest
+from httpx import AsyncClient
+
+
+@pytest.mark.asyncio
+class TestHealth:
+    async def test_health_returns_ok(self, client: AsyncClient):
+        resp = await client.get("/api/health")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert data["status"] == "healthy"
+        assert data["database"] == "connected"
+        assert data["cache"] == "connected"

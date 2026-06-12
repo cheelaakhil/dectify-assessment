@@ -1,0 +1,28 @@
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+backend/spacetoday.db
+
+# Node
+node_modules/
+dist/
+build/
+.npm/
+
+# IDEs and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
