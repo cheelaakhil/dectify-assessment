@@ -48,3 +48,4 @@ websockets==16.0
 slowapi
 pytest-cov
 redis>=5.0.0
+asyncpg
