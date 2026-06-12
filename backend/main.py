@@ -2,6 +2,11 @@
 SpaceToday API – DECTIFY Full Stack Assessment
 """
 import traceback
+import sys
+from pathlib import Path
+
+# Add the backend directory to sys.path so Vercel can resolve 'app'
+sys.path.append(str(Path(__file__).resolve().parent))
 
 try:
     import os
