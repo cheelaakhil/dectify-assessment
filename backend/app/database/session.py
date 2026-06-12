@@ -7,9 +7,9 @@ from sqlalchemy.orm import DeclarativeBase
 
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./spacetoday.db")
 if DATABASE_URL.startswith("postgres://"):
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+asyncpg://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
 elif DATABASE_URL.startswith("postgresql://"):
-    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
 
 if "postgresql" in DATABASE_URL and "?" not in DATABASE_URL:
     DATABASE_URL += "?ssl=require"
