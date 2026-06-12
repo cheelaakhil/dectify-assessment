@@ -99,7 +99,12 @@ async def generic_exception_handler(request: Request, exc: Exception):
 # CORS – allow the React dev server
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173", 
+        "http://localhost:3000",
+        os.getenv("FRONTEND_URL", "http://localhost:5173")
+    ],
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
