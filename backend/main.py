@@ -96,9 +96,10 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
+    import traceback
     return JSONResponse(
         status_code=500,
-        content={"error": {"code": "internal_error", "message": "An unexpected error occurred."}}
+        content={"error": {"code": "internal_error", "message": f"An unexpected error occurred: {str(exc)}", "traceback": traceback.format_exc()}}
     )
 
 # CORS – allow the React dev server
