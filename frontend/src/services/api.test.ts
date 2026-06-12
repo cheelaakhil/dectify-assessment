@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import api from './api';
-import axios from 'axios';
 import toast from 'react-hot-toast';
 
 vi.mock('react-hot-toast');
@@ -19,9 +18,9 @@ describe('API Client Error Handling', () => {
     
     // Simulate interceptor failure manually
     try {
-      // @ts-expect-error
+      // @ts-expect-error Mocking interceptor rejection
       await api.interceptors.response.handlers[0].rejected(error);
-    } catch (e) {
+    } catch {
       // expected to reject
     }
     
