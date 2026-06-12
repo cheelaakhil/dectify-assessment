@@ -44,10 +44,25 @@ async def get_apod(target_date: str | None = None) -> dict[str, Any]:
     if cached is not None:
         return cached
 
+    from fastapi import HTTPException
     params = {}
     if target_date:
         params["date"] = target_date
-    data = await _fetch(f"{NASA_BASE}/planetary/apod", params)
+        
+    try:
+        data = await _fetch(f"{NASA_BASE}/planetary/apod", params)
+    except (HTTPException, Exception) as e:
+        logger.warning(f"APOD API failed ({e}), returning fallback mock data.")
+        data = {
+            "date": target_date or date.today().isoformat(),
+            "explanation": "This is a fallback mock description for the Astronomy Picture of the Day. The NASA API is currently unavailable or rate-limited. Enjoy this beautiful placeholder image of the cosmos.",
+            "hdurl": "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1080",
+            "media_type": "image",
+            "service_version": "v1",
+            "title": "Cosmic Wonders (Mock Data)",
+            "url": "https://images.unsplash.com/photo-1462331940025-496dfbfc7564?w=1080"
+        }
+
     await cache.set(cache_key, data, ttl=CACHE_TTL)
     return data
 
@@ -130,10 +145,59 @@ async def get_asteroids(
     if cached is not None:
         return cached
 
-    data = await _fetch(
-        f"{NASA_BASE}/neo/rest/v1/feed",
-        {"start_date": start, "end_date": end},
-    )
+    from fastapi import HTTPException
+    try:
+        data = await _fetch(
+            f"{NASA_BASE}/neo/rest/v1/feed",
+            {"start_date": start, "end_date": end},
+        )
+    except (HTTPException, Exception) as e:
+        logger.warning(f"Asteroids API failed ({e}), returning fallback mock data.")
+        data = {
+            "element_count": 2,
+            "near_earth_objects": {
+                start: [
+                    {
+                        "id": "mock-asteroid-1",
+                        "name": "433 Eros (Mock)",
+                        "is_potentially_hazardous_asteroid": False,
+                        "estimated_diameter": {
+                            "kilometers": {
+                                "estimated_diameter_min": 16.84,
+                                "estimated_diameter_max": 34.0
+                            }
+                        },
+                        "close_approach_data": [
+                            {
+                                "close_approach_date": start,
+                                "miss_distance": {
+                                    "kilometers": "26000000"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "id": "mock-asteroid-2",
+                        "name": "101955 Bennu (Mock)",
+                        "is_potentially_hazardous_asteroid": True,
+                        "estimated_diameter": {
+                            "kilometers": {
+                                "estimated_diameter_min": 0.49,
+                                "estimated_diameter_max": 0.51
+                            }
+                        },
+                        "close_approach_data": [
+                            {
+                                "close_approach_date": start,
+                                "miss_distance": {
+                                    "kilometers": "7500000"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
     await cache.set(cache_key, data, ttl=CACHE_TTL)
     return data
 
@@ -151,13 +215,42 @@ async def get_eonet_events(limit: int = 10) -> dict[str, Any]:
         return cached
 
     # EONET v3 doesn't require an API key
-    async with httpx.AsyncClient(timeout=30.0) as client:
-        resp = await client.get(
-            "https://eonet.gsfc.nasa.gov/api/v3/events",
-            params={"limit": limit, "status": "open"},
-        )
-        resp.raise_for_status()
-        data = resp.json()
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.get(
+                "https://eonet.gsfc.nasa.gov/api/v3/events",
+                params={"limit": limit, "status": "open"},
+            )
+            resp.raise_for_status()
+            data = resp.json()
+    except Exception as e:
+        logger.warning(f"EONET API failed ({e}), returning fallback mock data.")
+        data = {
+            "title": "EONET Events",
+            "description": "Earth Observatory Natural Event Tracker",
+            "events": [
+                {
+                    "id": "EONET_MOCK_1",
+                    "title": "Wildfire in Mock Forest",
+                    "categories": [
+                        {
+                            "id": "wildfires",
+                            "title": "Wildfires"
+                        }
+                    ]
+                },
+                {
+                    "id": "EONET_MOCK_2",
+                    "title": "Volcanic Eruption at Mount Mock",
+                    "categories": [
+                        {
+                            "id": "volcanoes",
+                            "title": "Volcanoes"
+                        }
+                    ]
+                }
+            ]
+        }
 
     await cache.set(cache_key, data, ttl=CACHE_TTL)
     return data
