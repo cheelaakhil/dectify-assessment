@@ -11,11 +11,15 @@ from app.services import auth_service
 from app.api.deps import get_current_user
 from app.models.user import User
 from app.api.limiter import limiter
+import os
 
 router = APIRouter()
 
 REFRESH_COOKIE = "refresh_token"
 REFRESH_MAX_AGE = 7 * 24 * 60 * 60  # 7 days in seconds
+
+# Detect production: Vercel sets VERCEL=1 automatically
+_IS_PRODUCTION = bool(os.getenv("VERCEL") or os.getenv("PRODUCTION"))
 
 
 def _set_refresh_cookie(response: Response, token: str) -> None:
@@ -23,8 +27,8 @@ def _set_refresh_cookie(response: Response, token: str) -> None:
         key=REFRESH_COOKIE,
         value=token,
         httponly=True,
-        secure=False,       # Set True in production with HTTPS
-        samesite="lax",
+        secure=_IS_PRODUCTION,
+        samesite="none" if _IS_PRODUCTION else "lax",
         max_age=REFRESH_MAX_AGE,
         path="/api/auth",
     )

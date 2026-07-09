@@ -44,10 +44,12 @@ logger = logging.getLogger("spacetoday")
 async def lifespan(application: FastAPI):
     """Create tables on startup, dispose engine on shutdown."""
     logger.info("Starting SpaceToday API …")
-    if "sqlite" in str(engine.url):
+    try:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
         logger.info("Database tables ready.")
+    except Exception as exc:
+        logger.error("Failed to initialise database tables: %s", exc)
     
     # Initialize Redis if configured
     redis_url = os.getenv("REDIS_URL")
@@ -97,9 +99,11 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception):
     import traceback
+    logger.error("Unhandled exception on %s %s:\n%s",
+                 request.method, request.url.path, traceback.format_exc())
     return JSONResponse(
         status_code=500,
-        content={"error": {"code": "internal_error", "message": f"An unexpected error occurred: {str(exc)}", "traceback": traceback.format_exc()}}
+        content={"error": {"code": "internal_error", "message": "An internal server error occurred. Please try again later."}}
     )
 
 # CORS – allow the React dev server
