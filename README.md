@@ -1,6 +1,6 @@
 <div align="center">
   <h1>🚀 NASA-Space-Intelligence-Dashboard
-y</h1>
+</h1>
   <p><strong>A comprehensive, production-ready full-stack application for aggregating and exploring NASA API data.</strong></p>
   
   ![Python Version](https://img.shields.io/badge/Python-3.12-blue?logo=python)
